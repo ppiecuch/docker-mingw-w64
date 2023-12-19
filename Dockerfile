@@ -19,6 +19,7 @@ RUN set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get upgrade --no-install-recommends -y \
     && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+        apt-transport-https \
         ca-certificates \
         gcc \
         g++ \
@@ -46,6 +47,7 @@ RUN set -ex \
         flex \
         make \
         yasm \
+        curl \
         wget \
         zip \
         git \
@@ -168,7 +170,10 @@ RUN set -ex \
     \
     && apt-get remove --purge -y file gcc g++ zlib1g-dev libssl-dev libgmp-dev libmpfr-dev libmpc-dev libisl-dev \
     \
-    && apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub \
+    && if [ "$HOSTTYPE" == "x86_64" ]; then \
+    \
+    apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub \
+    \
     && echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /" > /etc/apt/sources.list.d/cuda.list \
     && apt-get update \
     \
@@ -177,6 +182,8 @@ RUN set -ex \
     \
     && ln -s /usr/bin/gcc /usr/local/cuda/bin/gcc \
     && ln -s /usr/bin/g++ /usr/local/cuda/bin/g++ \
+    \
+    ; fi \
     \
     && apt-get remove --purge -y gnupg \
     && apt-get autoremove --purge -y \
